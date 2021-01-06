@@ -1,12 +1,13 @@
-repoDir = "/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/Simulate networks/trophicSBM9/"
+repoDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 source(paste(repoDir,'functions_to_source.R',sep=""))
-
-masterDir = '/home/christophe/pCloud local/boulot/data/Simu_Networks/trophicSBM9/'
+masterDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
+if(masterDir!=getwd()){setwd(masterDir)}
+create.dir('Graphs')
 graphsDir = paste(masterDir,'Graphs/',sep="")
 
 set.seed(32)
 
-nPerSize = 30
+nPerSize = 2500
 
 exp = data.frame(maxTropLen=NA,
                  TropLens = NA,
