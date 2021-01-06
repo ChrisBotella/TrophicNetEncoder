@@ -13,14 +13,9 @@ require(umap)
 require(moments)
 require(randomForest)
 
-pcName =as.character(Sys.info()["nodename"]) 
-if(pcName=="DESKTOP-RUARS8N"){
-  use_python("C:/Users/user/miniconda3/python.exe",required = T)
-  source_python('C:/Users/user/pCloud local/boulot/Github/EcoGraph Encoder/embed_reduce_analyse_wrappers/py_get_ebd.py')
-}else if(pcName=="PORTHOS"){
-  use_python("/home/christophe/miniconda3/bin/python",required = T)
-  source_python('/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/embed_reduce_analyse_wrappers/py_get_ebd.py')
-}
+# CHANGE DIRECTORIES HEREAFTER
+use_python("C:/Users/JeanMichMich/miniconda3/python.exe",required = T)
+source_python('C:/Users/JeanMichMich/py_get_ebd.py')
 
 #####
 # Simulate graphs
