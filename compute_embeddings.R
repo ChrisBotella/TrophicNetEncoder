@@ -2,7 +2,7 @@ repoDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 source(paste(repoDir,'functions_to_source.R',sep=""))
 masterDir= getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 graphsDir = paste(masterDir,'Graphs/',sep="")
-
+ 
 # Order of rows in embeddings equal to properties table
 exp = read.csv(paste(masterDir,'graphsParameters.csv',sep=""),sep=";",header=T,stringsAsFactors = F)
 splitted = strsplit(exp$fileName,'.g')
