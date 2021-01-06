@@ -1,14 +1,14 @@
-repoDir = "/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/Simulate networks/trophicSBM9/"
+repoDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 source(paste(repoDir,'functions_to_source.R',sep=""))
 
-masterDir = "/home/christophe/pCloud local/boulot/data/Interaction Networks/Wood2015/"
+masterDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 
 graphsDir = paste(masterDir,"Graphs/",sep="")
 ebdDir = paste(masterDir,"Embeddings/",sep="")
 
 # Web scales
 setwd(ebdDir)
-load("WoodWebScales")
+load("woodData")
 orderedNetNames = as.character(webScales$name)
 
 # Assumes .graphml files are already created in .../Graphs/
@@ -43,9 +43,6 @@ sched = data.frame(ebd_method=c('Groups2Vec',
                             "list(graphsDir=graphsDir,depth=6,dim=30,lab=T)",
                             "list(nodeLabelAttribName=NULL)",
                             "list(nodeLabelAttribName='SBMgroupId')"))
-
-print(as.character(sched$ebd_method))
-gList = load.graphs.list(graphsDir)
 
 toRun = 1:dim(sched)[1]
 for(i in toRun){
