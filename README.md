@@ -1,5 +1,3 @@
-# TrophicNetEncoder
-
 These R scripts reproduce the simulated data and analysis of Botella et al. - 2021 - An appraisal of graph embeddings for analysing architectural variation across trophic networks.
 
 ## Required R packages
