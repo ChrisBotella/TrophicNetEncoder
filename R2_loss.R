@@ -1,3 +1,12 @@
+ebdDir = paste(getwd(),'Embeddings/') #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
+# Load property table and embeddings
+setwd(ebdDir)
+load(file = 'ebds_and_Graphproperties')
+load(file="umaps")
+
+# Order of rows in embeddings equal to properties table
+orderedNetNames = rownames(ebds[[1]])
+
 #####
 # Table of R2-loss in embedding
 #####
