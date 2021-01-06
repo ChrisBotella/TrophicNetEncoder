@@ -1,11 +1,6 @@
-
-repoDir = "C:/Users/user/pCloud local/boulot/Github/EcoGraph Encoder/Simulate networks/trophicSBM9/"
-#repoDir = "/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/Simulate networks/trophicSBM9/"
+repoDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 source(paste(repoDir,'functions_to_source.R',sep=""))
-
-masterDir="C:/Users/user/pCloud local/boulot/data/Simu_networks/trophicSBM9/"
-#masterDir='/home/christophe/pCloud local/boulot/data/Simu_Networks/trophicSBM9/'
-
+masterDir= getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
 graphsDir = paste(masterDir,'Graphs/',sep="")
 
 # Order of rows in embeddings equal to properties table
