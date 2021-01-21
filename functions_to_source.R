@@ -784,7 +784,7 @@ get.embedding = function(gList,ebdType=NULL,params=NULL){
       ebd = get_foodweb_metrics(gList=gList)
       "Info: no parameters found for applying the method"
     }
-    
+    ebd = scale(ebd,center=T,scale=T)
   }else if(ebdType=="Motifs2Vec"){
     # No parameters passed to this method
     ebd = as.data.frame(matrix(NA,length(gList),13))
