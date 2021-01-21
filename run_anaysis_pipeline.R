@@ -240,11 +240,15 @@ print(xtable(r2_all))
 # For Figure 2 and 3
 ##### 
 
+setwd(ebdDir)
+load(file="umaps")
+oob = read.csv('segregationTable.csv',sep=";",header=T,stringsAsFactors = F)
+r2 = read.csv('R2anderson_Umaps.csv',sep=";",header=T,stringsAsFactors = F)
+
 colfunc =colorRampPalette(c("blue", "red"))
 
 df = as.data.frame(expand.grid( method= names(ebds), prop =  c('maxTropLen','nchains','omni','generalism','loop') ))
 samp = sample(1:length(orderedNetNames),min(600,dim(ebds[[1]])[1]))
-plotlist = list()
 for(i in 1:dim(df)[1]){
   meth = as.character(df$method[i])
   prop =as.character(df$prop[i]) 
@@ -252,37 +256,48 @@ for(i in 1:dim(df)[1]){
   print(prop)
   
   setwd(ebdDir)
-  toPlot = read.csv(paste("umap_",meth,".csv",sep=""),sep=";",header=T,stringsAsFactors = F)
+  toPlot = umaps[as.character(df$method[i])][[1]]
+  #toPlot = read.csv(paste("umap_",meth,".csv",sep=""),sep=";",header=T,stringsAsFactors = F)
   
   toPlot[,prop] = factor(exp[,prop])
   toPlot$n = factor(exp$n)
   toPlot_tmp=toPlot[samp,]
+  
+  textToAdd= data.frame(lab=c(paste('oob accur.:',round(100*oob[oob$method==meth,prop])),
+                              paste('R2 umap:',round(100*r2[r2$name==meth,prop])/100)),
+                        x=rep( min(toPlot_tmp$umap1)+0.12*(max(toPlot_tmp$umap1)-min(toPlot_tmp$umap1)) ,2),
+                        y=c( max(toPlot_tmp$umap2)-0.00*(max(toPlot_tmp$umap2)-min(toPlot_tmp$umap2)),max(toPlot_tmp$umap2)-0.03*(max(toPlot_tmp$umap2)-min(toPlot_tmp$umap2)))) 
+  
   if(prop=="maxTropLen"){
-    plotlist[[i]] = ggplot(toPlot_tmp,
-                           aes(x=umap1,
-                               y=umap2,
-                               color=toPlot_tmp[,prop],
-                               shape=n))+
-      geom_point(size=2)+labs(color=prop)+
-      theme_bw()+
-      ggtitle(paste('Method:',meth,'; color:',prop))+
-      scale_color_manual(values=colfunc(4))+scale_shape_manual(values=c(4,16))
+    plOt = ggplot()+
+        geom_point(data=toPlot_tmp,
+                   aes(x=toPlot_tmp$umap1,
+                       y=toPlot_tmp$umap2,
+                       color=toPlot_tmp[,prop],
+                       shape=toPlot_tmp$n),size=2)+labs(color=prop)+
+        geom_text(data=textToAdd,aes(x=textToAdd$x,y=textToAdd$y,label=textToAdd$lab))+
+        theme_bw()+xlab('umap1')+ylab('umap2')+
+        ggtitle(paste('Method:',meth,'; color:',prop))+
+        scale_color_manual(values=colfunc(4))+scale_shape_manual(values=c(4,16))
+    
   }else{
-    plotlist[[i]] = ggplot(toPlot_tmp,
-                           aes(x=umap1,
-                               y=umap2,
-                               color=toPlot_tmp[,prop],
-                               shape=n))+
-      geom_point(size=2)+labs(color=prop)+
-      theme_bw()+
-      ggtitle(paste('Method:',meth,'; color:',prop))+
-      scale_color_manual(values=colfunc(2))+scale_shape_manual(values=c(4,16))
+    plOt = ggplot()+
+             geom_point(data=toPlot_tmp,
+                        aes(x=toPlot_tmp$umap1,
+                            y=toPlot_tmp$umap2,
+                            color=toPlot_tmp[,prop],
+                            shape=toPlot_tmp$n),size=2)+labs(color=prop)+
+             geom_text(data=textToAdd,aes(x=textToAdd$x,y=textToAdd$y,label=textToAdd$lab))+
+             theme_bw()+xlab('umap1')+ylab('umap2')+
+             ggtitle(paste('Method:',meth,'; color:',prop))+
+             scale_color_manual(values=colfunc(2))+scale_shape_manual(values=c(4,16))
   }
+
   setwd(ebdDir)
   png(paste('Figure_Umap_',meth,'_',prop,'.png',sep=""),
       height=400,
       width=500)
-  print(plotlist[[i]])
+  print(plOt)
   dev.off()
 }
 
