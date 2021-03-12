@@ -1,8 +1,13 @@
-repoDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
+
+repoDir = "C:/Users/user/pCloud local/boulot/Github/TrophicNetEncoder/"
+#repoDir = "/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/Simulate networks/trophicSBM9/"
 source(paste(repoDir,'functions_to_source.R',sep=""))
-masterDir= getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
+
+masterDir="C:/Users/user/pCloud local/boulot/data/Simu_networks/trophicSBM10/"
+#masterDir='/home/christophe/pCloud local/boulot/data/Simu_Networks/trophicSBM9/'
+
 graphsDir = paste(masterDir,'Graphs/',sep="")
- 
+
 # Order of rows in embeddings equal to properties table
 exp = read.csv(paste(masterDir,'graphsParameters.csv',sep=""),sep=";",header=T,stringsAsFactors = F)
 splitted = strsplit(exp$fileName,'.g')
@@ -55,7 +60,7 @@ sched = data.frame(ebd_method=c('Groups2Vec',
 print(as.character(sched$ebd_method))
 gList = load.graphs.list(graphsDir)
 
-toRun = c(4:9,12,13)
+toRun = c(1:13)
 for(i in toRun){
   print(paste('operation',i))
   method = as.character(sched$ebd_method[i])

@@ -1,8 +1,7 @@
-repoDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
+repoDir = "C:/Users/user/pCloud local/boulot/Github/TrophicNetEncoder/"
 source(paste(repoDir,'functions_to_source.R',sep=""))
-masterDir = getwd() #OR REPLACE BY DIRECTORY CONTAINING SCRIPTS
-if(masterDir!=getwd()){setwd(masterDir)}
-create.dir('Graphs')
+
+masterDir = 'C:/Users/user/pCloud local/boulot/data/Simu_Networks/trophicSBM10/'
 graphsDir = paste(masterDir,'Graphs/',sep="")
 
 set.seed(32)
@@ -56,7 +55,7 @@ for(j in 1:nGraphs){
 
   # set the block connections probabilities
   nb = sum(Ls)
-  fLoop = nNodes*(nNodes-nb)*nb^2/(2*nNodes^2*nb*(nb-nc))
+  fLoop = nNodes*(nNodes-nb)*nb/(nNodes^2*(nb-nc))
   fOmni = sum(sapply(1:nc,function(j)  choose(Ls[j]-1, 2) ))/(nb-nc)
   pOmni = exp$omni[j] * .2
   pLoop = exp$loop[j] * .15

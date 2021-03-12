@@ -13,9 +13,66 @@ require(umap)
 require(moments)
 require(randomForest)
 
-# CHANGE DIRECTORIES HEREAFTER
-use_python("C:/Users/JeanMichMich/miniconda3/python.exe",required = T)
-source_python('C:/Users/JeanMichMich/py_get_ebd.py')
+library(energy)
+require(xtable)
+
+pcName =as.character(Sys.info()["nodename"]) 
+if(pcName=="DESKTOP-RUARS8N"){
+  use_python("C:/Users/user/miniconda3/python.exe",required = T)
+  source_python('C:/Users/user/pCloud local/boulot/Github/EcoGraph Encoder/embed_reduce_analyse_wrappers/py_get_ebd.py')
+}else if(pcName=="PORTHOS"){
+  use_python("/home/christophe/miniconda3/bin/python",required = T)
+  source_python('/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/embed_reduce_analyse_wrappers/py_get_ebd.py')
+}
+
+#####
+# Plot functions
+#####
+
+
+panel.hist <- function(x, ...){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(usr[1:2], 0, 1.5) )
+  h <- hist(x, plot = FALSE,breaks="fd")
+  breaks <- h$breaks; nB <- length(breaks)
+  y <- h$counts; y <- y/max(y)
+  rect(breaks[-nB], 0, breaks[-1], y, ...)
+}
+
+
+multiplot <- function(plots=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  numPlots = length(plots)
+  print(numPlots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
 
 #####
 # Simulate graphs
@@ -99,7 +156,6 @@ load.graphs.list = function(graphsDir){
 #####
 # Foodweb metrics functions
 #####
-
 
 clusteringCoef = function(adjmat){
   tmp = data.frame(n=rep(0,2*dim(adjmat)[1]),ones=0)
@@ -488,7 +544,7 @@ get_foodweb_metrics = function(gList,
       df$density[i] = sum( (as.vector(adjmat[lower.tri(adjmat)]) + as.vector(t(adjmat)[lower.tri(t(adjmat))])) >0 ) / (n*(n-1)/2)
     }
     
-    if('dirCon'%in%metrics){df$dirCon[i] = sum(as.vector(abs(adjmat)))/(n^2)}
+    if('dirCon'%in%metrics){df$dirCon[i] = sum(as.vector(adjmat))/(n^2)}
     
     if('modul'%in%metrics){
       adj = as.matrix(as_adjacency_matrix(g))
@@ -524,7 +580,7 @@ get_foodweb_metrics = function(gList,
     
     # In Degrees distribution moments
     if(sum(regexpr('predPerPrey',metrics)>0)>0){
-      npreds = colSums(adjmat)
+      npreds = rowSums(adjmat)
       # average count of predators
       if('predPerPrey'%in%metrics){df$predPerPrey[i] = mean(npreds)}
       if('sd_predPerPrey'%in%metrics){df$sd_predPerPrey[i] = sd(npreds)}
@@ -533,7 +589,7 @@ get_foodweb_metrics = function(gList,
     
     # Out Degrees distribution moments
     if(sum(regexpr('preyPerPred',metrics)>0)>0){
-      npreys = rowSums(adjmat)
+      npreys = colSums(adjmat)
       # average count of preys
       if('preyPerPred'%in%metrics){df$preyPerPred[i] = mean(npreys)}
       if('sd_preyPerPred'%in%metrics){df$sd_preyPerPred[i] = sd(npreys)}
@@ -784,7 +840,7 @@ get.embedding = function(gList,ebdType=NULL,params=NULL){
       ebd = get_foodweb_metrics(gList=gList)
       "Info: no parameters found for applying the method"
     }
-    ebd = scale(ebd,center=T,scale=T)
+    ebd[,!colnames(ebd)=="name"] = scale(ebd[,!colnames(ebd)=="name"],center=T,scale=T)
   }else if(ebdType=="Motifs2Vec"){
     # No parameters passed to this method
     ebd = as.data.frame(matrix(NA,length(gList),13))
