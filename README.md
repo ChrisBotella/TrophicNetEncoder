@@ -1,4 +1,4 @@
-These codes and data enable to reproduce the simulated data and results of Botella et al. - 2021 - "An appraisal of graph embeddings for comparing trophicnetworks architectures".
+These R scripts reproduce the simulated data and results of Botella et al. - 2021 - "An appraisal of graph embeddings for comparing trophicnetworks architectures".
 
 ## Required R packages
 
