@@ -1,8 +1,8 @@
-These codes and data enable to reproduce the simulated data and results of Botella et al. - 2021 - "An appraisal of graph embeddings for analysing architectural variation across trophic networks".
+These codes and data enable to reproduce the simulated data and results of Botella et al. - 2021 - "An appraisal of graph embeddings for comparing trophicnetworks architectures".
 
 ## Required R packages
 
-igraph, network, intergraph, ggplot2, sna, GGally, reticulate, umap (R installation only), moments, randomForest, energy
+igraph, network, intergraph, ggplot2, sna, GGally, reticulate, umap (R installation only), moments, randomForest, energy, ggnet
 
 ## Graph2Vec python installation
 
@@ -26,4 +26,4 @@ source_python('C:/Users/JeanMichMich/py_get_ebd.py')
 
 ## How to reproduce results
 
-All files must be put in one directory which must be specified in the beginning of each R script. Then simply run **simulate_nets.R** to generate the dataset of networks, then run **compute_embeddings.R** to compute the embedding of the networks with each method, then run **run_analysis_pipeline.R** to reproduce the tables and Figures of the manuscript and run **wood2015_Embedding.R** to reproduce analysis on the empirical marine foodwebs.
+All files must be put in one directory which must be specified in the beginning of each R script. Then simply run **simulate_nets.R** to generate the dataset of networks, then run **compute_embeddings.R** to compute the embedding of the networks with each method, then run **run_analysis_pipeline.R** to reproduce all Tables and Figures of the manuscript.
