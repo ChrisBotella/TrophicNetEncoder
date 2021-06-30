@@ -20,9 +20,6 @@ pcName =as.character(Sys.info()["nodename"])
 if(pcName=="DESKTOP-RUARS8N"){
   use_python("C:/Users/user/miniconda3/python.exe",required = T)
   source_python('C:/Users/user/pCloud local/boulot/Github/EcoGraph Encoder/embed_reduce_analyse_wrappers/py_get_ebd.py')
-}else if(pcName=="PORTHOS"){
-  use_python("/home/christophe/miniconda3/bin/python",required = T)
-  source_python('/home/christophe/pCloud local/boulot/Github/EcoGraph Encoder/embed_reduce_analyse_wrappers/py_get_ebd.py')
 }
 
 #####
@@ -186,41 +183,6 @@ short.weighted.trophic.levels = function(g){
   # The short weighted trophic level (SWTL) 
   # is the average (directed) distance to the basal species (who have no prey)
   
-  # NB: it is computed only over the basal species that
-  # can be reached from the focal species following
-  # edges directions
-  
-  # Generalisation to non-connected graphs:
-  # the SWTL of a species i
-  # is the average of the distances between i 
-  # and the basals species that are connected with i
-  # because g is not necessarily connected
-  SWtrophicLevels = NULL
-  
-  membership=igraph::components(g)$membership
-  for(m in unique(membership)){# For each connected subgraph
-    originalIds = which(membership==m)
-    sub_g= induced_subgraph(g,vids = originalIds)# get the subgraph
-    
-    Adj = as_adj(sub_g)
-    
-    # ids of the basal species (who have no prey)
-    basals = which(rowSums(Adj)==0)
-    # Compute shortest distances between species 
-    D = igraph::distances(sub_g)
-    for(i in 1:dim(Adj)[1]){
-      # Short Weighted Trophic Level of species i
-      SWtrophicLevels[originalIds[i]] = mean(D[i,basals])
-    }
-  }
-  return(SWtrophicLevels)
-}
-
-
-short.weighted.trophic.levels = function(g){
-  # The short weighted trophic level (SWTL) 
-  # is the average (directed) distance to the basal species (who have no prey)
-  
   # /!\ By convention 
   # i predates j iif as_adjacency_matrix(g)[i,j]=1
   
@@ -331,8 +293,7 @@ trophiclevel <- function(g){
   return(TLvec)
 }
 
-
-### NOUVEAU CODE SPARSE MARC
+### NOUVEAU CODE SPARSE MacKay (Marc)
 trophicLevelMackay <- function(G) {
   A = as.matrix(get.adjacency(G))
   names_loc = rownames(A)
@@ -350,7 +311,6 @@ trophicLevelMackay <- function(G) {
   names(TL_vec) = names_loc
   return(TL_vec)
 }
-
 
 robustness = function(adj,n=100,extinctionOrder=c('random','rarest'),SpPresences=NULL){
   adj = as.matrix(adj)
@@ -714,108 +674,6 @@ CalculateShortestPathEmbedding = function(G,nodeLabelAttribName=NULL,directedPat
 # Triangular motifs count
 #####
 
-ReverseEdges=function(mot){
-  for(m in 1:length(mot)){
-    if(mot[m]==1){mot[m]=-1
-    }else if(mot[m]==-1){mot[m]=1}
-  }
-  return(mot)
-}
-
-Generate.Characteristic.3StepPaths = function(){
-  # Generate all characteristic paths 
-  # and derive the 13 non-isomorphic directed triangular motifs without self-link
-  
-  # Build pre-motifs list
-  premotifs = expand.grid(first=c(1,-1,2),two=c(1,-1,0,2),three=c(1,-1,0,2))
-  premotifs= premotifs[premotifs$two!=0 | premotifs$three!=0,]
-  
-  len = dim(premotifs)[2]
-  
-  premotifs$motifId = NA
-  k=1
-  for(i in 1:dim(premotifs)[1]){
-    mot = as.numeric(premotifs[i,1:3])
-    if(i==1){
-      premotifs$motifId[i] = k
-    }else{
-      j= 1
-      while(j<i){
-        # test translation and symmetries
-        if( sum(rev(ReverseEdges(mot))==premotifs[j,1:3]) == len ){
-          premotifs$motifId[i] = premotifs$motifId[j] 
-          j=i
-        }
-        for(l in 1:(len-1)){
-          seq = 1 + (l+c(0:(len-1))) %% 3
-          if( sum(rev(ReverseEdges(mot))==premotifs[j,seq]) == len | sum(mot==premotifs[j,seq]) == len ){
-            premotifs$motifId[i] = premotifs$motifId[j] 
-            j=i
-          }
-        }
-        j=j+1
-      }
-      if(is.na(premotifs$motifId[i])){
-        k=k+1
-        premotifs$motifId[i] = k
-      }
-    }
-  }
-  
-  return(premotifs)
-}
-
-stepType = function(m,Adj){
-  sapply(1:dim(m)[1],function(row){
-    go = Adj[m[row,1],m[row,2]]==1
-    back = Adj[m[row,2],m[row,1]]==1
-    if(go & back){return(2)
-    }else if(go & !back){return(1)
-    }else if(!go & back){return(-1)
-    }else{return(0)}})}
-
-Count.Triangular.Directed.Motifs.Obsolete = function(Adj){
-  premotifs = Generate.Characteristic.3StepPaths()
-  counts = rep(0,length(unique(premotifs$motifId)))
-  V = dim(Adj)[1]
-  done = NULL
-  #deb = Sys.time()
-  for(i in 1:V){
-    done = c(done,i)
-    #print('i done:')
-    #print(done)
-    #print(i)
-    #print(Sys.time()-deb)
-    js = setdiff(which(Adj[i,]>0 | Adj[,i]>0),done)
-    jdone = NULL
-    if(length(js)>0){
-      for(j in js){
-        
-        jdone = c(jdone,j)
-        #print('j done')
-        #print(jdone)
-        ks = setdiff(1:V,c(done,jdone))
-        if(length(ks)>0){
-          for(k in ks){
-            #print('k:')
-            #print(k)
-            steps = rbind(c(i,j),c(j,k),c(k,i))
-            path = stepType(steps,Adj)
-            if(sum(path[2:3]==0)<2){
-              motifId = premotifs$motifId[premotifs[,1]==path[1]  & premotifs[,2]==path[2] & premotifs[,3]==path[3]] 
-              counts[motifId] = counts[motifId] +1
-              #print(paste('motif n?:',motifId))
-            }else{
-              #print('no motif')
-            }
-          }
-        }
-      }
-    }
-  }
-  return(counts)
-}
-
 Count.Triangular.Directed.Motifs = function(Adj){
   counts = motifs(graph_from_adjacency_matrix(Adj),size=3)
   counts = counts[!is.na(counts)]
@@ -827,7 +685,7 @@ Count.Triangular.Directed.Motifs = function(Adj){
 # Generic function to get an embedding
 #####
 
-get.embedding = function(gList,ebdType=NULL,params=NULL){
+get.embedding = function(gList,ebdType=NULL,params=NULL,scaleCols=F){
   # gList: list of igraph objects, each element is a directed unweighted graph, possibly having nodes attributes
   # ebdType: character, available types are "Metrics" , "Motifs2Vec" , "Groups2Vec" , "ShortPaths2Vec , "Graph2Vec"
   # params: named list, see each method possible parameters
@@ -838,9 +696,12 @@ get.embedding = function(gList,ebdType=NULL,params=NULL){
       ebd = get_foodweb_metrics(gList=gList,metrics=params$metrics)
     }else{
       ebd = get_foodweb_metrics(gList=gList)
-      "Info: no parameters found for applying the method"
+      print("Info: no parameters found for applying the method")
     }
-    ebd[,!colnames(ebd)=="name"] = scale(ebd[,!colnames(ebd)=="name"],center=T,scale=T)
+    if(scaleCols){
+      ebd[,!colnames(ebd)=="name"] = scale(ebd[,!colnames(ebd)=="name"],center=T,scale=T)
+    }
+    
   }else if(ebdType=="Motifs2Vec"){
     # No parameters passed to this method
     ebd = as.data.frame(matrix(NA,length(gList),13))
